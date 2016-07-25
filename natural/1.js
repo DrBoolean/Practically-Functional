@@ -1,5 +1,5 @@
-const { Right, Left } = require('../../either')
-const Box = require('../../box')
+const { Right, Left } = require('../either')
+const Box = require('../box')
 const Task = require('data.task')
 
 // nt(a.map(f)) == nt(a).map(f)

@@ -1,5 +1,5 @@
-const { fromNullable } = require('../../either')
-const Box = require('../../box')
+const { fromNullable } = require('../either')
+const Box = require('../box')
 const Task = require('data.task')
 
 const httpGet = (path, params) =>

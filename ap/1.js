@@ -1,4 +1,4 @@
-const Either = require('../../either')
+const Either = require('../either')
 
 const $ = selector =>
   Either.of({selector, height: 10})

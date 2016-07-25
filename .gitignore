@@ -4,5 +4,6 @@ node_modules
 npm-debug.log
 *.swp
 .www
+.scratch.js
 public
 src/backend/es5/*

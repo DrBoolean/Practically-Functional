@@ -1,4 +1,4 @@
-const Box = require('../../box')
+const Box = require('./box')
 
 const first = xs =>
   xs[0]

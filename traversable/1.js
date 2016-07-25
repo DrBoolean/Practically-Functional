@@ -1,6 +1,6 @@
 const fs = require('fs')
 const Task = require('data.task')
-const Either = require('../../either')
+const Either = require('../either')
 const {Right, Left, fromNullable} = Either
 const { List, Map } = require('immutable-ext')
 
