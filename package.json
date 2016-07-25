@@ -1,0 +1,23 @@
+{
+  "name": "practically-functional-workshop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrBoolean/Practically-Functional.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DrBoolean/Practically-Functional/issues"
+  },
+  "homepage": "https://github.com/DrBoolean/Practically-Functional#readme",
+  "dependencies": {
+    "data.task": "^3.1.0",
+    "immutable-ext": "^1.0.3"
+  }
+}
