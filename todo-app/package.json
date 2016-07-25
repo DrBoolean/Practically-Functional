@@ -24,12 +24,9 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "d3": "^3.5.17",
     "data.either": "^1.4.0",
     "data.task": "^3.1.0",
     "immutable-ext": "^1.0.3",
-    "jquery": "^2.2.4",
-    "moment": "^2.13.0",
     "react": "^15.1.0",
     "react-dom": "^15.1.0"
   }

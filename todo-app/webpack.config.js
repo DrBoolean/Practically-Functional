@@ -3,8 +3,7 @@ var glob = require('glob');
 
 var config = {
   entry: {
-    build: './src/main.js',
-    vendors: ['d3', 'jquery']
+    build: './src/main.js'
   },
 
   resolve: {
