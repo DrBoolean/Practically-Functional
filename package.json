@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/DrBoolean/Practically-Functional#readme",
   "dependencies": {
+    "chai": "^3.5.0",
     "data.task": "^3.1.0",
-    "immutable-ext": "^1.0.3"
+    "immutable-ext": "^1.0.3",
+    "mocha": "^2.5.3"
   }
 }
