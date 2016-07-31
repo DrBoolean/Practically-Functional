@@ -20,10 +20,12 @@ const Db = ({
 const send = (code, json) =>
   console.log(`sending ${code}: ${JSON.stringify(json)}`)
 
-Db.find(1)
+Db.find(4) // Task(Right(User))
 .chain(eu =>
   eu.fold(e => Task.of(eu),
           u => Db.find(u.best_friend_id)))
 .fork(error => send(500, {error}),
       eu => eu.fold(error => send(404, {error}),
                     x => send(200, x)))
+
+

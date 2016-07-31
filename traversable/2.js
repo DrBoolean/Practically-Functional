@@ -8,3 +8,7 @@ const httpGet = (path, params) =>
 const getUser = x => httpGet('/user', {id: x})
 const getTimeline = x => httpGet(`/timeline/${x}`, {})
 const getAds = () => httpGet('/ads', {})
+
+const res = List.of(getUser(3), getTimeline(7), getAds())
+.traverse(Task.of, t => t)
+.fork(console.error, console.log)
