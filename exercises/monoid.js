@@ -33,7 +33,7 @@ describe("Monoid Exercises", () => {
   // Ex1: reimplement sum using foldMap and the Sum Monoid
   // =========================
 
-  const sum = xs => List(xs).reduce((acc, x) => acc + x, 0)
+  const sum = xs => List(xs).foldMap(Sum, Sum.empty())
 
 
   it("Ex1: sum", () => {
@@ -45,7 +45,7 @@ describe("Monoid Exercises", () => {
   // =========================
 
   const anyLessThanZero = xs =>
-    List(xs).reduce((acc, x) => acc < 0 ? true : false, false)
+    List(xs).foldMap(x => Any(x < 0 ? true : false), Any.empty())
 
 
   it("Ex2: anyLessThanZero", () => {
@@ -56,9 +56,16 @@ describe("Monoid Exercises", () => {
 
   // Ex3: Rewrite the reduce with a Max monoid (see Sum/Product/Any templates above)
   // =========================
+  const Max = x =>
+  ({
+    x: x,
+    concat: o => Max(x > o.x ? x : o.x),
+    toString: () => `Max(${x})`
+  })
+  Max.empty = () => Max(-Infinity)
 
   const max = xs =>
-    List(xs).reduce((acc, x) => acc > x ? acc : x, -Infinity)
+    List(xs).foldMap(Max, Max.empty())
 
 
   it("Ex3: max", () => {
@@ -73,7 +80,8 @@ describe("Monoid Exercises", () => {
   ({
     _1,
     _2,
-    concat: o => undefined // write me
+    concat: o =>
+      Tuple(_1.concat(o._1), _2.concat(o._2))
   })
 
   it("Ex4: tuple", () => {

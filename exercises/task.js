@@ -33,6 +33,8 @@ describe("Task Exercises", () => {
   // =========================
   const postTitle = id =>
     getPost(id) // Task(post)
+    .map(p => p.title)
+    .map(t => t.toUpperCase())
 
 
   it("Ex1: postTitle", (done) => {
@@ -48,6 +50,9 @@ describe("Task Exercises", () => {
   // =========================
   const commentsForPost = id =>
     getPost(id)
+    .chain(p =>
+      getComments(p)
+      .map(comments => Object.assign({comments}, p)))
 
 
   it("Ex2: commentsForPost", (done) => {
@@ -63,7 +68,7 @@ describe("Task Exercises", () => {
   // Ex3: Wrap __dirname in a Task to make it "pure"
   // =========================
   const getDirname =
-    __dirname // wrap me in Task
+    new Task((rej, res) => res(__dirname))
 
 
   it("Ex3: getHref", (done) => {

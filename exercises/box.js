@@ -19,7 +19,8 @@ describe("Box Exercises", () => {
   // Ex1: Using Box, refactor moneyToFloat
   // =========================
   const moneyToFloat = str =>
-    parseFloat(str.replace(/\$/, ''))
+    Box(str.replace(/\$/, ''))
+    .fold(r => parseFloat(r))
 
 
   it('ex1', () => {
@@ -32,10 +33,10 @@ describe("Box Exercises", () => {
 
   // Ex2: Using Box, refactor percentToFloat
   // =========================
-  const percentToFloat = str => {
-    const float = parseFloat(str.replace(/\%/, ''))
-    return float * 0.0100
-  }
+  const percentToFloat = str =>
+    Box(str.replace(/\%/, ''))
+    .map(s => parseFloat(s))
+    .fold(fl => fl * 0.0100)
 
 
   it('ex2', () => {
@@ -48,11 +49,12 @@ describe("Box Exercises", () => {
 
   // Ex3: Using Box, refactor applyDiscount (hint: each variable introduces a new Box)
   // =========================
-  const applyDiscount = (price, discount) => {
-    const cents = moneyToFloat(price)
-    const savings = percentToFloat(discount)
-    return cents - (cents * savings)
-  }
+  const applyDiscount = (price, discount) =>
+    Box(moneyToFloat(price))
+    .fold(cents =>
+      Box(percentToFloat(discount))
+      .fold(savings =>
+        cents - (cents * savings)))
 
 
   it('ex3', () => {
