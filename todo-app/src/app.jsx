@@ -1,54 +1,96 @@
 const React = require('react')
-const Todo = require('./todo')
 const Task = require('data.task')
-const TodoList = require('./todolist')
+const list = require('./todolist')
 const classNames = require('classnames')
-const Either = require('data.either')
-const { Right, Left, fromNullable } = Either
 const { pluralize } = require('./utils')
 
-const TodoItem = ({todo, onDestroy, onToggle}) =>
-  <li className={classNames({ completed: todo.completed_at })}>
-    <div className="view">
+const TodoItem = React.createClass({
+  getInitialState() {
+    return {editing: false}
+  },
+
+  handleEdit() {
+    this.refs.editField.value = this.props.todo.name
+    this.setState({editing: true})
+  },
+
+  stopEditOnEsc(e) {
+    if (e.key === 'Escape') return this.setState({editing: false})
+    if (e.key === 'Enter') {
+      this.props.onEdit(this.props.todo, this.refs.editField.value)
+      this.setState({editing: false})
+    }
+  },
+
+  render() {
+    return (
+      <li className={classNames({
+        completed: this.props.todo.completed_at,
+        editing: this.state.editing
+      })}>
+      <div className="view">
+        <input
+          className="toggle"
+          type="checkbox"
+          checked={this.props.todo.completed_at}
+          onChange={() => this.props.onToggle(this.props.todo)}
+        />
+        <label onDoubleClick={this.handleEdit}>
+          {this.props.todo.name}
+        </label>
+        <button className="destroy" onClick={() => this.props.onDestroy(this.props.todo)} />
+      </div>
       <input
-        className="toggle"
-        type="checkbox"
-        checked={todo.completed_at}
-        onChange={() => onToggle(todo)}
+        ref="editField"
+        className="edit"
+        onKeyDown={this.stopEditOnEsc}
       />
-      <label>
-        {todo.name}
-      </label>
-      <button className="destroy" onClick={() => onDestroy(todo)} />
-    </div>
-  </li>
+    </li>
+    )
+  }
+})
 
 module.exports = React.createClass({
   displayName: 'App',
 
   getInitialState() {
-    return {error: "", list: new TodoList(), filter: 'all' }
+    return {error: "", todos: [], filter: 'all' }
+  },
+
+  componentWillMount() {
+    list.getTodos()
+    .fork(alert, ts => this.setState({todos: ts}))
+  },
+
+  showError(s) {
+    this.setState({error: s})
+  },
+
+  edit(todo, name) {
+    list.update(todo, name, this.state.todos)
+    .fork(alert, ts => this.setState({todos: ts}))
   },
 
   destroy(todo) {
-    this.state.list.destroy(todo, (err, list) => {
-      if(err) return alert(err)
-      this.setState({list: list})
-    })
+    list.destroy(todo, this.state.todos)
+    .fork(alert, ts => this.setState({todos: ts}))
   },
 
   toggle(todo) {
-    this.state.list.toggle(todo, (err, list) => {
-      if(err) return alert(err)
-      this.setState({list: list})
-    })
+    list.toggle(todo, this.state.todos)
+    .fork(alert, ts => this.setState({todos: ts}))
+  },
+
+  toggleAll() {
+    list.toggleAll(this.state.todos)
+    .fork(alert, ts => this.setState({todos: ts}))
   },
 
   save(input) {
-    this.state.list.save(input.value, (err, list) => {
-      if(err) return alert(err)
-      this.setState({list: list})
+    list.save(input.value, this.state.todos)
+    .fork(alert, ts => {
       input.value = ""
+      this.setState({todos: ts})
     })
   },
 
@@ -61,30 +103,31 @@ module.exports = React.createClass({
   },
 
   clearCompleted() {
-    this.state.list.clearCompleted((err, list) => {
-      if(err) return alert(err)
-      this.setState({list: list})
-    })
+    list.clearCompleted(this.state.todos)
+    .fork(alert, ts => this.setState({todos: ts}))
   },
 
   incompleteCount() {
-    return this.state.list.incomplete().length
+    return list.incomplete(this.state.todos).length
   },
 
-  renderMain(list) {
-    const todos = list[this.state.filter]()
+  renderMain() {
+    const todos = list[this.state.filter](this.state.todos)
 
     return (
       <section className="main">
         <input
           className="toggle-all"
           type="checkbox"
+          onChange={this.toggleAll}
+          checked={this.incompleteCount() === 0}
         />
         <ul className="todo-list">
           {todos.map(t =>
             <TodoItem
               key={t.name}
               todo={t}
+              onEdit={this.edit}
               onDestroy={this.destroy}
               onToggle={this.toggle} />
             )}
@@ -147,10 +190,11 @@ module.exports = React.createClass({
           autoFocus={true}
         />
         </header>
-        {this.state.list.todos.length ? this.renderMain(this.state.list) : null}
+        {this.state.todos.length ? this.renderMain() : null}
         {this.renderFooter()}
       </div>
     )
   }
 })
+
 

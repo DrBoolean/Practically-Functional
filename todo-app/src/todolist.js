@@ -1,98 +1,91 @@
 const Task = require('data.task')
-const Todo = require('./todo')
 const Either = require('data.either')
 const {Right, Left, fromNullable} = Either
-const {find} = require('./utils')
+const {find, copyArray} = require('./utils')
+const {toggleCompletedAt, sanitizeName, Todo} = require('./todo')
+const {getItem, setItem} = require('./localstorage')
+const {validateUnique, validateNotEmpty} = require('./validations')
 
+const getTodos = () =>
+  getItem('todos')
+  .map(e => e.chain(Either.try(JSON.parse)))
+  .map(x => x.getOrElse([]))
+
+const setTodos = todos =>
+  Task.of(JSON.stringify(todos))
+  .chain(str => setItem('todos', str))
+  .map(() => todos)
 
 const findTodo = (todos, todo) =>
-  todos.filter(t => t.name === todo.name)[0]
+  find(todos, t => t.name === todo.name)
 
-class TodoList {
-  constructor() {
-    this.getTodos((err, ts) => {
-      if(err) {
-        this.todos = []
-      } else {
-        this.todos = ts
-      }
-    })
-  }
+const save = (name, todos) =>
+  validateNotEmpty(name)
+  .map(sanitizeName)
+  .map(t => Todo(t))
+  .chain(t =>
+    validateUnique(findTodo, todos, t))
+  .map(todo => todos.concat(todo))
+  .fold(e => Task.rejected(e),
+        ts => setTodos(ts))
 
-  getTodos(callback) {
-    const item = localStorage.getItem('todos')
+const update = (todo, name, todos) =>
+  validateNotEmpty(name)
+  .map(sanitizeName)
+  .chain(() =>
+    findTodo(todos, todo)
+    .map(t => Object.assign(t, {name})))
+  .fold(e => Task.rejected(e),
+        () => setTodos(todos))
 
-    try {
-      const todoData = JSON.parse(item)
-      const todos = todoData.map(t => new Todo(t))
-      callback(null, todos)
-    } catch(e) {
-      callback(null, [])
-    }
-  }
+const toggle = (todo, todos) =>
+  Task.of(copyArray(todos))
+  .chain(ts =>
+    findTodo(ts, todo)
+    .map(t => toggleCompletedAt(t))
+    .fold(e => Task.rejected(e),
+          () => setTodos(ts)))
 
-  setTodos(callback) {
-    localStorage.setItem('todos', JSON.stringify(this.todos))
-    callback(null, this)
-  }
+const toggleAll = todos =>
+  Task.of(copyArray(todos))
+  .map(ts =>
+    ts.map(t => toggleCompletedAt(t)))
+  .chain(ts => setTodos(ts))
 
-  createTodo(name) {
-    return new Todo({
-      name: name,
-      createdAt: new Date()
-    })
-  }
+const destroy = (todo, todos) =>
+  Task.of(copyArray(todos))
+  .chain(ts =>
+    findTodo(ts, todo)
+    .map(i => ts.indexOf(i))
+    .map(i => ts.splice(i,1))
+    .fold(e => Task.rejected(e),
+          () => setTodos(ts)))
 
-  save(name, callback) {
-    const todo = this.createTodo(name)
-    if(name.trim()) {
-      if(find(this.todos, t => t.name == todo.name)) {
-        return callback("duplicate todo")
-      } else {
-        this.todos.unshift(todo)
-        this.setTodos(callback)
-      }
-    } else {
-      return callback("name can't be empty")
-    }
-  }
+const newestFirst = todos =>
+  todos.sort((a, b) =>
+    Number(a.created_at < b.created_at))
 
-  toggle(todo, callback) {
-    todo.toggleComplete()
-    this.setTodos(callback)
-  }
+const all = newestFirst
 
-  destroy(todo, callback) {
-    const names = this.todos.map(t => t.name)
-    const index = names.indexOf(todo.name)
+const clearCompleted = todos =>
+  setTodos(incomplete(todos))
 
-    if(index >= 0) {
-      this.todos.splice(index,1)
-      this.setTodos(callback)
-    }
-  }
+const complete = todos =>
+  newestFirst(todos).filter(t => t.completed_at)
 
-  clearCompleted(callback) {
-    this.todos = this.incomplete()
-    this.setTodos(callback)
-  }
+const incomplete = todos =>
+  newestFirst(todos).filter(t => !t.completed_at)
 
-  newestFirst() {
-    return this.todos.sort((a, b) =>
-       Number(a.created_at < b.created_at))
-  }
-
-  all() {
-    return this.newestFirst()
-  }
-
-  complete() {
-    return this.newestFirst().filter(t => t.completed_at)
-  }
-
-  incomplete() {
-    return this.newestFirst().filter(t => !t.completed_at)
-  }
+module.exports = {
+  save,
+  update,
+  destroy,
+  toggle,
+  toggleAll,
+  complete,
+  all,
+  incomplete,
+  clearCompleted,
+  getTodos
 }
 
-module.exports = TodoList

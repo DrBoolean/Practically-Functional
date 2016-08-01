@@ -1,23 +1,14 @@
-class Todo {
+const Todo = name =>
+  ({name, completed_at: null, created_at: Date()})
 
-  constructor(attrs) {
-    this.name = this.sanitizeName(attrs.name)
-    this.created_at = attrs.created_at || new Date()
-    this.completed_at = attrs.completed_at
-  }
+const sanitizeName = name =>
+  name.replace(/[<>]/g, '')
 
-  sanitizeName(name) {
-    if (name) return name.replace(/[<>]/g, '')
-  }
+const toggleCompletedAt = t =>
+  Object.assign(t, {completed_at: t.completed_at ? null : Date()})
 
-  toggleComplete() {
-    if (!this.completed_at) {
-      this.completed_at = new Date()
-    } else {
-      this.completed_at = null
-    }
-  }
-
+module.exports = {
+  Todo,
+  sanitizeName,
+  toggleCompletedAt
 }
-
-module.exports = Todo
