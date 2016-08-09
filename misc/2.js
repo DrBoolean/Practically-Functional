@@ -11,7 +11,7 @@ Box.of('small').concat(Box.of('pox'))
 // Box('smallpox')
 //
 // Applicative
-Box.of(x => x + 1).ap(2)
+Box.of(x => x + 1).ap(Box.of(2))
 // Box(3)
 
 // Traversable
