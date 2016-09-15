@@ -1,1 +1,2 @@
-[1,2,3].reduce((acc, x) => acc + x, 0)
+const res = 1 + 1
+console.log(res)

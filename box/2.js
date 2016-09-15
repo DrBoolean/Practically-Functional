@@ -11,3 +11,5 @@ const halfTheFirstLargeNumber = xs => {
 
 const res = halfTheFirstLargeNumber([1, 4, 50])
 console.log(res)
+
+
