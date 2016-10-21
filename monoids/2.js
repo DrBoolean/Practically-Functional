@@ -3,7 +3,7 @@ const { Map } = require("immutable-ext")
 const Sum = x =>
 ({
   x,
-G concat: ({x: y}) =>
+  concat: ({x: y}) =>
     Sum(x + y),
   inspect: () =>
     `Sum(${x})`
