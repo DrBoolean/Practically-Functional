@@ -1,4 +1,4 @@
 # Practically-Functional
 practically functional programming workshop
 
-Slides: https://www.slideshare.net/secret/3IPPDiGR2QXNEz
+Videos: https://egghead.io/courses/professor-frisby-introduces-composable-functional-javascript
